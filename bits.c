@@ -19,7 +19,7 @@
  * Difficulty: 1
  */
 int bitAnd(int x, int y) {
-    return 2;
+    return ~(~x | ~y);
 }
 
 /*
@@ -30,7 +30,7 @@ int bitAnd(int x, int y) {
  *   Difficulty: 1
  */
 int bitXor(int x, int y) {
-    return 2;
+    return ~(~x & ~y) & ~(x & y);
 }
 
 /*
@@ -50,7 +50,18 @@ int bitXor(int x, int y) {
  *   1 if x and y have the same sign , 0 otherwise.
  */
 int samesign(int x, int y) {
-    return 2;
+    int x_sign=x>>31;
+    int y_sign=y>>31;
+    if(!x&&!y){
+        return 1;
+    }
+    if(x_sign&&y_sign){
+        return 1;
+    }
+    if((x&&y)&&(!x_sign&&!y_sign)){
+        return 1;
+    }
+    return 0;
 }
 
 /*
@@ -63,7 +74,24 @@ int samesign(int x, int y) {
  *   Difficulty: 4
  */
 int logtwo(int v) {
-    return 2;
+    int result=0;
+    int check;
+    check=(v>65535);
+    v=v>>(check<<4);
+    result=result|(check<<4);
+    check=(v>255);
+    v=v>>(check<<3);
+    result=result|(check<<3);
+    check=(v>15);
+    v=v>>(check<<2);
+    result=result|(check<<2);
+    check=(v>3);
+    v=v>>(check<<1);
+    result=result|(check<<1);
+    check=(v>1);
+    v=v>>(check);
+    result=result|(check);
+    return result;
 }
 
 /*
@@ -76,7 +104,14 @@ int logtwo(int v) {
  *    Difficulty: 2
  */
 int byteSwap(int x, int n, int m) {
-    return 2;
+    int ns=n<<3;
+    int ms=m<<3;
+    int n_byte=(x>>ns)&0xFF;
+    int m_byte=(x>>ms)&0xFF;
+    int mask=~((0xFF<<ns)|(0xFF<<ms));
+    x=x&mask;
+    x|=(n_byte<<ms)|(m_byte<<ns);
+    return x;
 }
 
 /*
@@ -88,7 +123,13 @@ int byteSwap(int x, int n, int m) {
  *   Difficulty: 3
  */
 unsigned reverse(unsigned v) {
-    return 2;
+    unsigned r=0;
+    int i;
+    for(i=32;i;i=i-1){
+        r=(r<<1)|(v&1);
+        v=v>>1;
+    }
+    return r;
 }
 
 /*
@@ -100,11 +141,14 @@ unsigned reverse(unsigned v) {
  *   Difficulty: 3
  */
 int logicalShift(int x, int n) {
-    return 2;
+    x=x>>n;
+    int mask=~(((1<<31)>>n)<<1);
+    x=x&mask;
+    return x;
 }
 
 /*
- * leftBitCount - returns count of number of consective 1's in left-hand (most) end of word.
+ * leftBitCount - returns count of number of consecutive 1's in left-hand (most) end of word.
  *   Examples: leftBitCount(-1) = 32, leftBitCount(0xFFF0F0F0) = 12,
  *             leftBitCount(0xFE00FF0F) = 7
  *   Legal ops: ! ~ & ^ | + << >>
@@ -112,7 +156,30 @@ int logicalShift(int x, int n) {
  *   Difficulty: 4
  */
 int leftBitCount(int x) {
-    return 2;
+    int inv=~x;
+    int r=0;
+    int b;
+    
+    b=!(inv>>16);
+    r=r+(b<<4);
+    inv=inv<<(b<<4);
+
+    b=!(inv>>24);
+    r=r+(b<<3);
+    inv=inv<<(b<<3);
+
+    b=!(inv>>28);
+    r=r+(b<<2);
+    inv=inv<<(b<<2);
+
+    b=!(inv>>30);
+    r=r+(b<<1);
+    inv=inv<<(b<<1);
+
+    b=!(inv>>31);
+    r=r+b;
+
+    return r+!inv;
 }
 
 /*
